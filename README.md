@@ -1,4 +1,4 @@
-# AGSheaf
+# A/G Sheaf
 
 Sheaf theory for multi-agent control and decision systems.
 
