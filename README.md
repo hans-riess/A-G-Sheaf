@@ -1,6 +1,6 @@
 # A/G Sheaf
 
-Sheaf theory for multi-agent control and decision systems.
+Sheaf theory for decision-making in multi-agent systems with demo pipelines for the Georgia Tech Robotarium. Funded by DARPA (HR0011-25-3-0235).
 
 ## Installation
 
@@ -10,3 +10,6 @@ cd agsheaf
 python3.11 bootstrap.py
 source .venv/bin/activate
 ```
+## !Documentation[doc/README.md]
+
+
