@@ -10,6 +10,9 @@ cd agsheaf
 python3.11 bootstrap.py
 source .venv/bin/activate
 ```
-## !Documentation[doc/README.md]
+
+## Documentation
+
+Please see our work-in-progress [documentation](doc/README.md).
 
 
