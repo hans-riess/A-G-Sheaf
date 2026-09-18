@@ -1,0 +1,129 @@
+gridworld:
+  grid_width: 9
+  grid_height: 5
+  grid_safety_gap: 0.2             
+  min_distance_repulsion: 0.20     
+  max_distance_repulsion: 0.30    
+  show_arrows: false
+  show_figure: false
+  sim_in_real_time: false
+  asynchronous_moves: false
+  move_schedule: null
+  arrival_distance: 0.05
+
+beliefs:
+  default: unknown     
+  mark_other_agents_unsafe: false
+  observe_on_arrival: false        
+  tour_views_every: never
+  switch_view_every: never
+  follow_moving_agent: false
+
+goals:
+  max_ticks: 18000
+  stall_ticks: 600
+
+sheaf:
+  enabled: true
+  sweeps_per_step: 1
+  sweep_every_ticks: 15
+  max_sweeps: 100                  
+  share_assignments: true
+  mission_monitor: true
+  legs: kan
+  record_iterates: true
+  record_contracts: false
+
+contracts:
+  reliance: true
+  exclusive_claims: true
+  region_penalty: 12.0
+
+planning:
+  route_around_after_ticks: 150
+  tile_costs:
+    target: 1.0
+    safe: 1.0
+    unknown: 3.0
+    unsafe: 30.0
+
+scoring:
+  tile_scores:
+    target: 5.0
+    safe: 1.0
+    unsafe: -2.0
+
+video:
+  output_dir: 'videos'
+  fps: 30
+  one_per_view: false
+  frames_per_sweep: 10   
+  frames_per_view: 30 
+
+logging:
+  enabled: true
+  output_dir: 'logs'
+  record_poses: true
+
+rendering:
+  show_view_in_status: true
+  show_legend: false               
+  legend_fontsize: xx-small
+  belief_alpha: 0.45
+  show_agent_badges: true 
+  agent_badge_radius: 0.055
+  robot_length: 0.095
+  badge_edge_color: '#051E39'
+  badge_text_color: '#FFFFFF'
+  assigned_number_fontsize: 7
+  static_assignment_numbers: true
+  show_assignment_numbers: true
+  show_communication: true
+  communication_color: '#051E39'
+  communication_alpha: 0.25
+  communication_linewidth: 0.8
+  communication_linestyle: '--'
+  show_sections: true 
+  section_color: '#066034'
+  no_section_color: '#D90368'
+  agent_label_offset: 1
+  show_idle_communication: false
+  show_messages: true
+  message_blink_ticks: 10
+  message_alpha: 1.0
+  message_width_scale: 2.5
+  section_alpha: 0.9
+  section_linewidth: 1.4
+  section_linestyle: '-'
+  no_section_linestyle: null
+  contested_marker:  'x'
+  contested_color: '#D90368'
+  contested_fontsize: 8
+  show_sheaf_status: true
+  sheaf_status_fontsize: 14
+  sheaf_status_color: null
+  sheaf_status_position: [0.025, 0.93]
+  sheaf_status_ha: left
+  sheaf_status_va: top
+  sheaf_status_rotation: 0
+  sheaf_status_weight: normal
+  sheaf_status_background: true
+  show_regions: true
+  region_line_color: '#051E39'
+  region_line_width: 3.4
+  region_line_alpha: 0.9
+  show_region_names: true
+  region_name_color: '#051E39'
+  region_name_alpha: 0.45
+  region_name_fontsize: 36
+  fill_ground_truth_safe: false
+  label_colors:
+    target: '#EAAA00'
+    safe: '#066034'
+    unsafe: '#D90368'
+    unknown: 'none'
+  comparison_colors:
+    agree: 'none'
+    one_sided: 'none'
+    conflict: '#051E39'
+    both_unknown: 'none'

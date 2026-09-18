@@ -1,0 +1,74 @@
+experiment_name: primary
+seed: 0
+
+gridworld:
+  grid_width: 12
+  grid_height: 8
+  num_agents: 4
+  show_figure: true
+  asynchronous_moves: true
+  move_schedule: random
+  max_distance_repulsion: 0.19
+  min_distance_repulsion: 0.13
+  arrival_distance: 0.045
+
+goals:
+  max_steps: 100
+
+assignments:
+  0: [11, 0]
+  1: [11, 7]
+  2: [0, 0]
+  3: [0, 4]
+
+communication:
+  edges: [[0, 1], [1, 2], [2, 3]]
+
+beliefs:
+  views: [ground_truth,0,1,2,3]
+  # false because there are 5 views for 4 agents: follow_moving_agent picks the view by
+  # the index of the agent that just moved, so it needs exactly one per agent.
+  follow_moving_agent: false
+  observe_on_arrival: true
+  agents:
+    0:
+      target: [[0, 0], [0, 7]]
+      safe: [[0, 0], [4, 7]]
+      unsafe: [[4, 4], [4, 2]]
+    1:
+      target: [[0, 7], [0, 0]]
+      safe: [[0, 0], [2, 0], [3, 0], [3, 2]]
+      unsafe: [[9, 2], [11, 2]]
+    2:
+      target: [[11, 7], [0, 0]]
+      safe: [[6, 0], [8, 2]]
+      unsafe: [[0, 7], [2, 7]]
+
+    3:
+      target: [[0, 4], [0, 0]]
+      safe: [[6, 0], [7, 0]]
+      unsafe: [[6, 3], [6, 4]]
+
+ground_truth:
+  default: safe
+  unsafe: [[4, 3], [4, 4], [4, 5], [4, 6], [4, 7],
+           [8, 2], [9, 2], [10, 2], [11, 2]]
+  target: [[0, 0], [11, 0], [11, 7], [0, 4]]
+
+regions:
+  A: {rect: [0, 4, 3, 7]}
+  B: {rect: [0, 0, 3, 3]}
+  C: {rect: [4, 4, 7, 7]}
+  D: {rect: [4, 0, 7, 3]}
+  E: {rect: [8, 4, 11, 7]}
+  F: {rect: [8, 0, 11, 3]}
+
+sheaf:
+  enabled: true
+  sweeps_per_step: 1
+
+rendering:
+  show_sheaf_status: false
+
+video:
+  one_per_view: true

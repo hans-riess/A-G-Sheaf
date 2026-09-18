@@ -1,0 +1,177 @@
+# A second instance of the demonstration scenario of doc/ms4_report (Subtask 5.1): same design,
+# different world. Run it with
+#
+#     python exp/run.py exp/worlds/variation.yaml
+#
+# A named experiment file is merged over exp/defaults.yaml alone -- not over exp/worlds/primary.yaml --
+# so this file is self-contained and can diverge from the primary world freely.
+#
+# Why a second instance. The report's claims are structural: that the flow closes over
+# disagreement living in the kernel of the region summary, that a correction crosses the network
+# diameter, that abstract agreement arrives while concrete beliefs still differ. A single world
+# cannot distinguish those claims from a lucky arrangement of one grid, so this file re-seeds all
+# three of the designed conflicts on a different partition-relative geometry, holding the
+# apparatus fixed: same 12 x 8 arena and six rooms, same chain topology and diameter, same
+# planner, same scoring. What changes is where the hazards, the targets and the errors sit.
+#
+# The three seeded conflicts of the report, re-instantiated (agents named 1-4 as in the report,
+# indices 0-3 here):
+#
+#   Region-level conflict.  Agents 1 and 2 (indices 0, 1) believe a target stands at (2,5) in
+#     the northwest room A, where Agent 3 (index 2) believes hazards. Room A is thus flagged and
+#     excluded at once: a genuine conflict in the interface vocabulary, which is where it has to
+#     be resolved. In the primary world this conflict also lives in the northwest; the tiles
+#     carrying it are different.
+#
+#   Diameter-length correction.  The true central hazard wall stands in column 6; Agent 4
+#     (index 3) has it in column 4, two tiles WEST of the truth, and explicitly believes column 6
+#     to be clear. Left alone it detours around empty ground and drives into the real wall. Only
+#     Agent 1 (index 0) holds the wall correctly, and the chain puts it three hops away, so the
+#     correction must traverse the network's diameter. Note the mirror of the primary world,
+#     where the misplacement is two tiles east: the correction travels the same distance against
+#     the opposite error.
+#
+#     Both walls are deliberately PARTIAL, and their gaps are deliberately in DIFFERENT rows:
+#     the true wall leaves row 0 open, Agent 4's false one leaves row 3. This is the
+#     load-bearing detail of the arrangement and the easiest thing to destroy by tidying. Give
+#     the two walls a gap in the same row and that row becomes a corridor which clears both at
+#     once, so Agent 4 sails down it, never meets the truth, and the conflict evaporates. Seal
+#     either wall to its room's full height and it is routed around the room entirely, with the
+#     same result. Staggering the gaps is what forces the detour around the imagined wall to
+#     cross the real one.
+#
+#     What this actually produces, measured (see the note at the foot of this file): with
+#     communication ON, Agent 4 is steered clear of the hazard and the team scores +107; with it
+#     OFF, Agent 4 drives into the real wall at step 7, sits on it through step 9, learns it the
+#     hard way, and the team scores +76. That contrast is the deliverable -- the same seeded
+#     error, priced with and without the flow.
+#
+#   Disagreement below the vocabulary.  Both the true wall (column 6) and Agent 4's misplaced one
+#     (column 4) lie INTERIOR to room D, and the second wall lies interior to room E. So the true
+#     wall and the false one flag the same region, and at the interface's resolution Agent 4 is
+#     not even wrong. The sections close over the tile-level disagreement -- the abstraction
+#     earning its keep, which is the whole point of putting the walls where they are.
+#
+# Editing the walls, then, is not free: moving either one so that it straddles two rooms destroys
+# the third conflict, because the misplacement would become visible in the interface vocabulary
+# and the flow would simply correct it like any other disagreement.
+
+experiment_name: variation
+seed: 0
+
+gridworld:
+  grid_width: 12
+  grid_height: 8
+  num_agents: 4
+  show_figure: true
+  asynchronous_moves: false
+  move_schedule: random
+  max_distance_repulsion: 0.19
+  min_distance_repulsion: 0.13
+  arrival_distance: 0.045
+
+goals:
+  max_steps: 100
+
+# Crossing traffic: every agent is sent to the far side of the arena, two across the north and
+# two across the south, so the corridors that carry the mission contracts actually contend for
+# ground. Agents 2 and 4 (indices 1, 3) run the southern lane, which is where the central wall
+# stands and where the diameter-length correction has to arrive in time to matter.
+starts:
+  0: [1, 5]
+  1: [0, 1]
+  2: [11, 6]
+  3: [11, 2]
+
+assignments:
+  0: [10, 1]
+  1: [10, 7]
+  2: [1, 6]
+  3: [1, 1]
+
+# The chain of the report: diameter 3, so the correction of conflict two crosses the whole
+# network. Holding the topology fixed against the primary world is what makes the two instances
+# comparable.
+communication:
+  edges: [[0, 1], [1, 2], [2, 3]]
+
+beliefs:
+  views: [ground_truth, [0,1], ground_truth, [1,2], ground_truth, [2,3]]
+  switch_view_every: 2
+  observe_on_arrival: true
+  agents:
+    # Agent 1: holds the central wall correctly and is the only one who does. Three hops from
+    # Agent 4, which has it wrong. Wrong itself about the eastern wall, which it believes clear.
+    0:
+      unsafe: [[6, 1], [6, 2], [6, 3]]
+      target: [[2, 5], [10, 1]]
+      safe: [[8, 5], [9, 5]]
+    # Agent 2: shares the belief that a target stands at (2,5) in room A, and has picked up half
+    # of the eastern wall correctly.
+    1:
+      target: [[2, 5], [10, 7]]
+      unsafe: [[8, 5], [9, 5]]
+    # Agent 3: believes room A is hazarded exactly where Agents 1 and 2 put a target. Also
+    # believes the true central wall is clear, so it contributes nothing to Agent 4's correction.
+    2:
+      unsafe: [[2, 5], [3, 5]]
+      target: [[1, 1]]
+      safe: [[6, 2], [6, 3]]
+    # Agent 4: the misplaced central wall, two columns west of the truth, and the true column
+    # explicitly believed clear. Both columns are interior to room D, so the interface cannot
+    # tell this error from the truth -- only an observation or the flow can.
+    3:
+      unsafe: [[4, 0], [4, 1], [4, 2]]
+      safe: [[6, 1], [6, 2], [6, 3]]
+      target: [[1, 1]]
+
+# Two hazard walls, each wholly interior to one room and each leaving a gap (see the header). The
+# central wall in D stands across the southern lane with row 3 open; the eastern wall in E lies
+# between room E's south edge and its target at (10,7), with column 11 open.
+ground_truth:
+  default: safe
+  unsafe: [[6, 1], [6, 2], [6, 3],
+           [8, 5], [9, 5], [10, 5]]
+  target: [[1, 1], [10, 1], [10, 7], [1, 6]]
+
+# The same six-room partition as the primary world: this is the interface vocabulary, and the
+# comparison between instances is only meaningful if the resolution agreement is measured at is
+# held fixed.
+regions:
+  A: {rect: [0, 4, 3, 7]}
+  B: {rect: [0, 0, 3, 3]}
+  C: {rect: [4, 4, 7, 7]}
+  D: {rect: [4, 0, 7, 3]}
+  E: {rect: [8, 4, 11, 7]}
+  F: {rect: [8, 0, 11, 3]}
+
+sheaf:
+  enabled: true
+  sweeps_per_step: 1
+
+rendering:
+  show_sheaf_status: false
+
+# Measured behaviour of this file, seed 0, so a later edit can be told from a regression.
+# Re-measured under `move_schedule: random` above; the earlier figures on the null schedule were
+# 21 steps / +59 and 16 steps / +38, so the schedule changes the numbers but not the story.
+#
+#   demonstration arm (this file, as it stands)   34 steps, all arrived, scores 35/6/31/35 = +107
+#   no communication  (sheaf.enabled: false)      33 steps, all arrived, scores 20/6/31/19 = +76
+#
+# Run the second without copying this file:
+#
+#     agsheaf sims exp/worlds/variation.yaml --set sheaf.enabled=false
+#
+# One caveat on that: --set does not change experiment_name, so both arms log themselves as
+# "variation" and are told apart by the `config` block their log records rather than by name.
+#
+# One honest note on what the flow does and does not do here, because the trace is easy to
+# misread. Agent 4's TILE-level belief about the central wall is never corrected in the
+# demonstration arm: it finishes the run still holding the wall in column 4 and still calling
+# column 6 clear. The flow speaks the region vocabulary, and both columns lie in room D, so the
+# error is invisible at the interface -- which is conflict three working exactly as designed,
+# not a defect. What the flow changes is where Agent 4 GOES: routed by the network's regional
+# knowledge and its neighbours' claims, it never enters the contested ground, and so never pays
+# for an error it still holds. The correction is behavioural, not doxastic. In the
+# no-communication arm nothing routes it, and the wall corrects it by collision instead.

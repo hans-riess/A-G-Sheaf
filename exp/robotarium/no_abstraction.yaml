@@ -1,0 +1,16 @@
+# The same world, filmed with the abstraction switched off: the legacy f = id belief sheaf,
+# tile-by-tile fusion over bijective restrictions. Applied on top of config.yaml:
+#
+#     python exp/robotarium/build_submission.py \
+#         --config exp/robotarium/config.yaml exp/robotarium/no_abstraction.yaml
+#
+# The bare `regions:` key below wins the section-by-section merge and blanks the partition
+# exp/worlds/primary.yaml configures, which is exactly how the local control arm runs. Everything else
+# is held fixed, so against the abstraction run the difference on the floor is the vocabulary
+# the interfaces speak: here an interface agrees only when the two tile grids match outright,
+# there is no region overlay, no route claims and no recommitments, and the caption counts
+# interfaces rather than reading out the two levels.
+
+experiment_name: no_abstraction_robotarium
+
+regions:

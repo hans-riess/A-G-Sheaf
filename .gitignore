@@ -1,0 +1,63 @@
+# Virtual environments
+.venv/
+
+# Environment variables
+.env
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Setuptools / packaging
+*.egg-info/
+*.egg
+build/
+dist/
+
+# Test / type-check caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# IDE
+.vscode/
+.idea/
+
+_testing/
+_dump/
+_scrap/
+_old/
+_notebooks/
+
+# Web Files (for now)
+*.js
+*.css
+*.woff
+
+# To-do notes
+TODO.md
+
+# Experiments
+logs*/
+submission*/
+benchmarks*/
+builds.jsonl
+builds/
+videos*/
+previews*/
+
+
+# Backup
+*.bak
+
+# MacOS
+*.DS_Store
+
+# AI
+CLAUDE.md
+._*
+
+# Slides
+old_ms2/
+old_ms3
+!slides.qmd

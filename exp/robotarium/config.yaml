@@ -1,0 +1,42 @@
+gridworld:
+  show_figure: true
+  sim_in_real_time: false
+
+rendering:
+  belief_alpha: 0.85
+  label_colors:
+    target: '#FFC400'
+    safe: '#00A63F'
+    unsafe: '#E4002B'
+  show_legend: false
+  show_agent_badges: false
+  show_assignment_numbers: false  
+  show_region_names: false
+  contested_marker: '×'
+  contested_color: '#000000'
+  contested_fontsize: 14
+  show_sheaf_status: false
+  sheaf_status_fontsize: 20
+  sheaf_status_color: '#000000'
+  sheaf_status_position: [0.075, 0.5]
+  sheaf_status_ha: center
+  sheaf_status_va: center
+  sheaf_status_rotation: 90
+  sheaf_status_weight: bold
+  sheaf_status_background: false
+  show_sections: true
+  section_color: '#000000'
+  no_section_color: '#000000'
+  no_section_linestyle: '--'
+  section_linewidth: 2.2
+  message_width_scale: 1.0
+  region_line_width: 3.4
+  region_line_alpha: 0.9
+
+robotarium:
+  hold_steps_per_sweep: 60
+  hold_steps_per_view: 45
+  hold_steps_at_end: 90
+
+logging:
+  record_poses: true

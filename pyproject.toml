@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agsheaf"
+description = "Sheaf theory for multi-agent control and decision systems."
+version = "0.1.0"
+authors = [
+  { name="Hans Riess", email="hans@hansriess.com" },
+  { name="Adam Pooley", email="apooley3@gatech.edu" }
+]
+license = "MIT"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+
+dependencies = [
+    "numpy",
+    "scipy",
+    "pyqt5",
+    "ipython",
+    "networkx",
+    "matplotlib",
+    "opencv-python",
+    "pytest",
+    "pyyaml",
+    # The contract layer is z3 all the way down: contracts.py and gridsheaf.py are written
+    # against it directly. It arrived transitively through pacti until pacti stopped being
+    # used, so it is declared here where it is actually depended on.
+    "z3-solver>=4.15.1.0"
+]
+
+# The `agsheaf` command, a front for the runners in exp/. Nothing about it reaches the
+# Robotarium: a submission is the flat bundle build_submission.py writes, which carries neither
+# this package's entry points nor any YAML.
+[project.scripts]
+agsheaf = "agsheaf.cli:main"

@@ -1,0 +1,30 @@
+# The same world, filmed with the flow switched off. Applied on top of config.yaml:
+#
+#     python exp/robotarium/build_submission.py \
+#         --config exp/robotarium/config.yaml exp/robotarium/no_communication.yaml
+#
+# The pair of runs is the argument. Everything is held fixed -- the grid, the starting squares,
+# the assignments, what each agent begins believing, the topology it is drawn over -- and the
+# single difference is whether the Tarski Laplacian runs at all. So a difference in where the
+# robots go can only have come from the flow.
+#
+# The agents keep their disagreements here: nobody learns that the tile they believe is a
+# target is only safe, that a region on their corridor is hazarded, or that a neighbour's route
+# claims the ground they are counting on.
+#
+# With no sheaf there are no iterates to dwell on, so nothing is held mid-run; the closing hold
+# stays, to end on the state the run reached.
+
+experiment_name: no_communication_robotarium
+
+sheaf:
+  enabled: false                   # no belief sheaf, so no sweeps and no fusing
+
+rendering:
+  show_sheaf_status: false         # there is no iterate to name
+  show_sections: false             # an edge has no state to be in, so it goes back to the faint
+                                   # dashed styling: the topology exists, it just carries nothing
+  contested_marker: ''             # nothing empties a possibility set without a flow to do it
+
+robotarium:
+  hold_steps_per_sweep: 0          # no sweeps to hold on

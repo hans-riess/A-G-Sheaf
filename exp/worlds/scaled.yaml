@@ -1,0 +1,216 @@
+# The variation scenario of exp/worlds/variation.yaml, scaled from 4 agents to 8. Run it with
+#
+#     python exp/run.py exp/worlds/scaled.yaml
+#
+# exp/worlds/variation.yaml is left alone as the 4-agent instance, so the two can be run against each
+# other; this file is the same world, the same six-room vocabulary, the same two hazard walls and
+# the same three seeded conflicts, carrying twice the network.
+#
+# What scaling changes, and why it is the interesting axis. The chain grows with the network, so
+# its DIAMETER grows with it: 3 hops at four agents, 7 hops at eight. The diameter is the bound
+# the report gives on how long the synchronous flow needs to reach a global section, so doubling
+# the agents roughly doubles the number of sweeps a correction needs to cross the network, while
+# the interface vocabulary -- six rooms, fixed -- stays exactly the size it was. That is the
+# point of scaling this way rather than by enlarging the grid: the thing being tested is whether
+# a FIXED abstraction still absorbs the disagreement of a network twice as large, and it can only
+# be read off a world whose regions did not grow too.
+#
+# Eight is also under the MAX_ROBOTS = 18 ceiling in exp/robotarium/build_submission.py, so this
+# arm remains physically submittable rather than simulation-only.
+#
+# The three seeded conflicts of doc/ms4_report (Subtask 5.1), carried over and stretched:
+#
+#   Region-level conflict.  Agents 1, 2 and 6 (indices 0, 1, 5) believe a target stands at (2,5)
+#     in the northwest room A, where Agent 3 (index 2) believes hazards. Room A is flagged and
+#     excluded at once. With eight agents the conflict now has three proponents against one
+#     dissenter spread further along the chain, so the fused summary has to survive more hops
+#     before the interfaces close over it.
+#
+#   Diameter-length correction.  The true central hazard wall stands in column 6; Agent 8
+#     (index 7) has it in column 4, two columns WEST of the truth, and explicitly believes column
+#     6 clear. Only Agent 1 (index 0) holds it correctly, and the chain now puts the two at
+#     OPPOSITE ENDS -- seven hops apart, against three in the 4-agent instance. This is the
+#     scaling claim in its sharpest form: the same error, the same vocabulary, twice the distance
+#     for the knowledge to travel.
+#
+#     Both walls stay PARTIAL with their gaps in DIFFERENT rows (true wall leaves row 0 open, the
+#     false one leaves row 3), for the reason set out at length in exp/worlds/variation.yaml: give them
+#     a gap in the same row and it becomes a corridor clearing both at once, so the agent sails
+#     down it and the conflict evaporates. Do not tidy them.
+#
+#   Disagreement below the vocabulary.  Both the true wall (column 6) and the misplaced one
+#     (column 4) lie INTERIOR to room D, so they flag the same region and the error is invisible
+#     at the interface's resolution. The sections close over it. Adding agents does not change
+#     this -- which is the result worth having, since it is what "the abstraction absorbs the
+#     disagreement" has to mean if it means anything at scale.
+#
+# Eight targets, one per agent, spread over all six rooms; every assignment is a tile the ground
+# truth calls a target, which the runner asserts.
+
+experiment_name: scaled
+seed: 0
+
+gridworld:
+  grid_width: 12
+  grid_height: 8
+  num_agents: 8
+  show_figure: true
+  asynchronous_moves: false
+  move_schedule: random
+  max_distance_repulsion: 0.19
+  min_distance_repulsion: 0.13
+  arrival_distance: 0.045
+
+goals:
+  max_steps: 100
+
+# Four long crossings and four short local trips, rather than eight crossings. This is a load
+# balance, not decoration: with exclusive region claims a room that holds a PARKED agent will not
+# pass a transiting one, so eight agents all crossing the centre deadlock room C for a couple of
+# hundred steps until the flow settles and releases them. Indices 0, 1, 2 and 7 make the long
+# runs; 3, 4, 5 and 6 stay in their own corner of the arena and keep out of the transit rooms.
+#
+# Index 7 makes the southern crossing through room D, which is where the central wall stands and
+# where the seven-hop correction has to arrive in time to matter.
+starts:
+  0: [1, 5]
+  1: [0, 1]
+  2: [11, 6]
+  3: [3, 0]
+  4: [9, 0]
+  5: [2, 7]
+  6: [8, 7]
+  7: [11, 2]
+
+assignments:
+  0: [10, 1]
+  1: [10, 7]
+  2: [1, 6]
+  3: [5, 0]
+  4: [11, 4]
+  5: [0, 3]
+  6: [5, 7]
+  7: [1, 1]
+
+# The chain of the report, extended: diameter 7, and indices 0 and 7 -- the agent holding the
+# central wall correctly and the agent holding it wrongly -- sit at opposite ends of it.
+communication:
+  edges: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7]]
+
+beliefs:
+  views: [ground_truth, [0, 1], ground_truth, [3, 4], ground_truth, [6, 7]]
+  switch_view_every: 2
+  observe_on_arrival: true
+  agents:
+    # Agent 1: the only holder of the central wall, and seven hops from the agent who needs it.
+    # Wrong itself about the eastern wall, which it believes clear.
+    0:
+      unsafe: [[6, 1], [6, 2], [6, 3]]
+      target: [[2, 5], [10, 7]]
+      safe: [[8, 5], [9, 5]]
+    # Agent 2: shares the belief that a target stands at (2,5) in room A.
+    1:
+      target: [[2, 5], [1, 6]]
+      unsafe: [[8, 5], [9, 5]]
+    # Agent 3: believes room A is hazarded exactly where 1, 2 and 6 put a target, and believes
+    # the true central wall is clear, so it contributes nothing to Agent 8's correction.
+    2:
+      unsafe: [[2, 5], [3, 5]]
+      target: [[1, 1]]
+      safe: [[6, 2], [6, 3]]
+    # Agent 4: correct about the eastern wall, wrong about where Agent 7 was sent.
+    3:
+      unsafe: [[8, 5], [9, 5], [10, 5]]
+      target: [[5, 7], [4, 0]]
+    # Agent 5: believes the eastern wall clear, which is where it is actually going.
+    4:
+      safe: [[8, 5], [10, 5]]
+      target: [[1, 6]]
+    # Agent 6: the third proponent of the contested target in room A.
+    5:
+      target: [[2, 5], [0, 3]]
+      safe: [[6, 3]]
+    # Agent 7: believes the true central wall clear, compounding Agent 8's error one hop away
+    # from it.
+    6:
+      safe: [[6, 1], [6, 2]]
+      target: [[5, 0]]
+    # Agent 8: the misplaced central wall, two columns west of the truth, and the true column
+    # explicitly believed clear. Both columns are interior to room D, so the interface cannot
+    # tell this error from the truth -- only an observation or a reroute can.
+    7:
+      unsafe: [[4, 0], [4, 1], [4, 2]]
+      safe: [[6, 1], [6, 2], [6, 3]]
+      target: [[1, 1]]
+
+# The same two walls as exp/worlds/variation.yaml, unchanged: the central wall interior to D with row 0
+# open, the eastern wall interior to E with column 11 open. Eight targets, one per agent.
+ground_truth:
+  default: safe
+  unsafe: [[6, 1], [6, 2], [6, 3],
+           [8, 5], [9, 5], [10, 5]]
+  target: [[10, 1], [10, 7], [11, 4], [5, 7],
+           [1, 6], [0, 3], [5, 0], [1, 1]]
+
+# The same six-room partition, deliberately NOT scaled with the network: the interface alphabet
+# stays the size it was while the network doubles. See the header.
+regions:
+  A: {rect: [0, 4, 3, 7]}
+  B: {rect: [0, 0, 3, 3]}
+  C: {rect: [4, 4, 7, 7]}
+  D: {rect: [4, 0, 7, 3]}
+  E: {rect: [8, 4, 11, 7]}
+  F: {rect: [8, 0, 11, 3]}
+
+sheaf:
+  enabled: true
+  sweeps_per_step: 1
+
+rendering:
+  show_sheaf_status: false
+
+# Measured behaviour of this file, seed 0, so a later edit can be told from a regression.
+#
+#   demonstration arm (this file)            34 steps, all arrived, 25/8/31/9/20/18/13/38 = +162
+#   no communication (sheaf.enabled: false)  32 steps, all arrived, 13/8/31/9/20/18/13/23 = +135
+#   no abstraction   (regions blanked)                                                    = +120
+#
+# All three arms, without copying this file:
+#
+#     agsheaf sims --world scaled
+#     agsheaf sims --world scaled --no-com
+#     agsheaf sims --world scaled --no-abstraction
+#
+# An arm suffixes experiment_name, so the runs log themselves as scaled,
+# scaled_no_communication and scaled_no_abstraction rather than three files under one name.
+#
+# Note that `--num-agents 8` does NOT run this file -- it GENERATES a world at that size, which is
+# a different world and, as agsheaf/worldgen.py's KNOWN LIMITATION records, one where the hazard
+# collision does not fire. The numbers above belong to this file and are reached by naming it.
+#
+# This file was called variation8.yaml until the worlds were gathered into exp/worlds/; the agent
+# count is in its contents, not its name.
+#
+# Worth a look before this goes in the report: the no-abstraction arm scores BELOW the
+# no-communication one here, so at this scale tile-by-tile fusion is worse than not fusing at
+# all, and the region vocabulary is carrying more of the result than communicating as such. That
+# is one seed on one world, so it is a lead rather than a finding.
+#
+# The scaled instance reproduces the 4-agent result in structure, at twice the diameter:
+#
+#   * With communication ON no agent ever enters a hazard tile, and Agent 8 finishes still
+#     holding the central wall in the wrong column -- steered clear of an error it never gave up.
+#   * With it OFF, Agent 8 drives into the real wall at step 16, sits on it through step 19, and
+#     learns it by collision (its belief on column 6 goes from "clear, clear, clear" to
+#     "clear, hazard, hazard"). It scores +23 against +38, and Agent 1 +13 against +25.
+#
+# So the correction is behavioural rather than doxastic here exactly as it is at four agents (see
+# the long note at the foot of exp/worlds/variation.yaml): the flow speaks the region vocabulary, both
+# columns lie in room D, and the error stays invisible at the interface while the routing it
+# would have spoiled is fixed anyway. Doubling the network and the chain's diameter did not
+# change that, which is the claim this file exists to support.
+#
+# One scaling lesson worth keeping, learned the hard way: an earlier layout sent all eight agents
+# on long crossings, and rooms C and E deadlocked for ~200 steps (241 steps total against 34
+# here) because an exclusive claim will not pass a transiting agent through a room that already
+# holds a parked one. Load the transit rooms lightly; see the note above the starts block.
